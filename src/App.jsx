@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
-import SocialLogin from './components/auth/SocialLogin';
-import OnboardingForm from './components/auth/OnboardingForm';
+import SocialLogin from './components/Auth/SocialLogin';
+import OnboardingForm from './components/Auth/OnboardingForm';
 import SelfieVerify from './components/Verify/SelfieVerify';
 import Discover from './components/Discover/Discover';
 import ChatRoom from './components/Chat/ChatRoom';

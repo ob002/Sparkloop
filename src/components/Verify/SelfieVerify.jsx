@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { compareFaces, detectFace } from '../../services/facePlusPlus';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { compareFaces, detectFace } from '../../services/facePlusPlus.js';
 import { Camera, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 
 function SelfieVerify({ onVerified }) {

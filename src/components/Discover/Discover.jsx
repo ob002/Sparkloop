@@ -11,7 +11,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { useAuth } from '../../context/AuthContext';
-import { generatePersonalizedIcebreaker } from '../../utils/generateIcebreaker';
+import { generatePersonalizedIcebreaker } from '../../utils/generateIcebreaker.js';
 import { Heart, X, Sparkles, MapPin, Clock } from 'lucide-react';
 
 function Discover({ onChatOpen }) {

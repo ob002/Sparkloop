@@ -5,13 +5,12 @@ import { getStorage } from 'firebase/storage';
 
 
 const firebaseConfig = {
-  
-  apiKey:AIzaSyAS6xXCkoRfDafvN3xbL3Bs5VOVeh92puM
-  authDomain:sparkloop-b2444.firebaseapp.com
-  projectId:sparkloop-b2444
-  storageBucket:sparkloop-b2444.appspot.com
-  messagingSenderId:1234567890
-  appId:1:1234567890:web:0987654321
+  apiKey: "AIzaSyAS6xXCkoRfDafvN3xbL3Bs5VOVeh92puM",
+  authDomain: "sparkloop-b2444.firebaseapp.com",
+  projectId: "sparkloop-b2444",
+  storageBucket: "sparkloop-b2444.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:0987654321"
 };
 
 const app = initializeApp(firebaseConfig);
