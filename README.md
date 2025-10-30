@@ -119,9 +119,9 @@ sparkloop/
 ## 🔗 Live Links
 - **Live Demo**: https://sparkloop.web.app  
 - **Slides**: https://bit.ly/SparkLoop-Deck  
-- **Repo**: https://github.com/your-org/sparkloop  
-
----
+- **Repo**:  
+     
+   ---
 
 ## 📄 License
 MIT © 2025 SparkLoop Team
