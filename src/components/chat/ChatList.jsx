@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { getDiscoverProfiles, createSwipe, getUserSwipes } from '../services/firestore';
+import { useAuth } from '../../hooks/useAuth.js';
+import { getDiscoverProfiles, createSwipe, getUserSwipes } from '../../services/firestore.js';
 import ProfileCard from '../components/discover/ProfileCard';
 import SwipeActions from '../components/discover/SwipeActions';
 import { Loader, PartyPopper, Heart } from 'lucide-react';

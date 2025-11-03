@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { verifyUserIdentity } from '../services/faceVerification';
-import SelfieCapture from '../components/verification/SelfieCapture';
+import SelfieCapture from '../components/verification/SelfieCapture.jsx';
 import { Shield, Loader, CheckCircle, XCircle } from 'lucide-react';
 
 const Verify = () => {

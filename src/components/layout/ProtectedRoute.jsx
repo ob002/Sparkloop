@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import ProtectedRoute from './components/layout/ProtectedRoute';
+import ProtectedRoute from './components/layout/ProtectedRoute.jsx';
 import Landing from './pages/Landing';
 import Onboarding from './pages/Onboarding';
 import Discover from './pages/Discover';
