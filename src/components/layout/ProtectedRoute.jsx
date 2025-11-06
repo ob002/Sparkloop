@@ -29,6 +29,7 @@ const ProtectedRoute = ({ children, requireVerification = false }) => {
 
 export default ProtectedRoute;
 
+<<<<<<< HEAD
 =======
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './components/layout/ProtectedRoute.jsx';
@@ -84,3 +85,5 @@ function App() {
   );
 }
 >>>>>>> f0ad6cfda9215423e9e6159d340c95e9e075098a
+=======
+>>>>>>> 81fdaea (update)

@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 import React from 'react';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './components/layout/ProtectedRoute.jsx';
 
@@ -20,6 +21,17 @@ import Verify from './pages/Verify';
 import Discover from './pages/Discover';
 import Chat from './pages/ChatList.jsx';
 >>>>>>> f0ad6cfda9215423e9e6159d340c95e9e075098a
+=======
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './components/layout/ProtectedRoute.jsx';
+
+// Pages (match your src/pages folder)
+import Landing from './pages/Landing.jsx';
+import Onboarding from './pages/Onboarding.jsx';
+import Discover from './pages/Discover.jsx';
+import ChatList from './pages/ChatList.jsx';
+import Verify from './pages/Verify.jsx';
+>>>>>>> 81fdaea (update)
 
 function App() {
   return (
@@ -64,6 +76,7 @@ function App() {
         />
       </Routes>
     </BrowserRouter>
+<<<<<<< HEAD
 =======
 import { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
@@ -181,6 +194,8 @@ function App() {
       {pages[currentPage] || pages.login}
     </div>
 >>>>>>> origin/master
+=======
+>>>>>>> 81fdaea (update)
   );
 }
 
