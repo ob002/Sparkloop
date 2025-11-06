@@ -1,134 +1,129 @@
 import { doc, updateDoc } from "firebase/firestore";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
-import { db, storage } from "./firebase.js";
+import { db, storage } from "./firebase";
 
-const FACEPP_API_KEY = import.meta.env.VITE_FACEPP_API_KEY;
-const FACEPP_API_SECRET = import.meta.env.VITE_FACEPP_API_SECRET;
+// Optional: Face++ keys
+const FACEPP_API_KEY = import.meta.env.VITE_FACEPP_API_KEY || null;
+const FACEPP_API_SECRET = import.meta.env.VITE_FACEPP_API_SECRET || null;
 const FACEPP_COMPARE_URL = "https://api-us.faceplusplus.com/facepp/v3/compare";
 
-/**
- * Convert data URL image to base64 (remove prefix)
- */
-const imageToBase64 = (imageData) => {
-  return imageData.split(",")[1];
-};
+// Convert base64
+const imageToBase64 = (imageData) => imageData.split(",")[1];
 
-/**
- * Upload selfie to Firebase Storage
- */
+// ✅ Upload selfie (only if user chooses to verify)
 export const uploadSelfie = async (userId, imageData) => {
+  if (!imageData) return null;
+
   try {
     const selfieRef = ref(storage, `selfies/${userId}_${Date.now()}.jpg`);
-
-    // Upload base64 string
     await uploadString(selfieRef, imageData, "data_url");
-
-    // Get download link
     return await getDownloadURL(selfieRef);
   } catch (error) {
-    console.error("Error uploading selfie:", error);
-    throw error;
+    console.error("Selfie upload error:", error);
+    return null;
   }
 };
 
-/**
- * Compare selfies using Face++
- */
-export const compareFaces = async (image1Data, profilePhotoURL) => {
+// ✅ Compare faces (only if user chooses verification)
+export const compareFaces = async (image1Data, image2URL) => {
+  if (!FACEPP_API_KEY || !FACEPP_API_SECRET) {
+    return {
+      matched: false,
+      confidence: 0,
+      details: "Verification disabled",
+    };
+  }
+
   try {
     const formData = new FormData();
     formData.append("api_key", FACEPP_API_KEY);
     formData.append("api_secret", FACEPP_API_SECRET);
     formData.append("image_base64_1", imageToBase64(image1Data));
-    formData.append("image_url2", profilePhotoURL);
+    formData.append("image_url2", image2URL);
 
-    const response = await fetch(FACEPP_COMPARE_URL, {
-      method: "POST",
-      body: formData,
-    });
+    const res = await fetch(FACEPP_COMPARE_URL, { method: "POST", body: formData });
+    const data = await res.json();
 
-    const data = await response.json();
+    if (data.error_message) throw new Error(data.error_message);
 
-    if (data.error_message) {
-      throw new Error(data.error_message);
-    }
-
-    const confidence = data.confidence ?? 0;
-    const matched = confidence >= 80;
-
+    const confidence = data.confidence || 0;
     return {
-      matched,
+      matched: confidence >= 80,
       confidence,
       details: data,
     };
-  } catch (error) {
-    console.error("Error comparing faces:", error);
-    throw error;
+  } catch (err) {
+    console.error("Compare error:", err);
+    return { matched: false, confidence: 0 };
   }
 };
 
-/**
- * Full Identity Verification Flow
- */
-export const verifyUserIdentity = async (
-  userId,
-  selfieData,
-  profilePhotoURL
-) => {
+// ✅ OPTIONAL VERIFICATION CONTROLLER
+export const verifyUserIdentity = async (userId, selfieData, profilePhotoURL) => {
   try {
-    // Upload selfie
+    // ✅ If user CHOOSES NOT to verify → Save minimal state & allow them in
+    if (!selfieData) {
+      await updateDoc(doc(db, "users", userId), {
+        verified: false,
+        verificationSkipped: true,
+        verificationAttemptedAt: new Date(),
+      });
+
+      return {
+        success: true,
+        confidence: 0,
+        message: "Verification skipped. You can verify later anytime.",
+        skipped: true,
+      };
+    }
+
+    // ✅ User DID verify
     const selfieURL = await uploadSelfie(userId, selfieData);
+    const result = await compareFaces(selfieData, profilePhotoURL);
 
-    // Compare with profile image
-    const comparisonResult = await compareFaces(selfieData, profilePhotoURL);
-
-    // Update Firestore user doc
-    const userRef = doc(db, "users", userId);
-    await updateDoc(userRef, {
-      verified: comparisonResult.matched,
+    await updateDoc(doc(db, "users", userId), {
+      verified: result.matched,
       verificationAttemptedAt: new Date(),
-      verificationConfidence: comparisonResult.confidence,
+      verificationConfidence: result.confidence,
       selfieURL,
+      verificationSkipped: false,
     });
 
     return {
-      success: comparisonResult.matched,
-      confidence: comparisonResult.confidence,
-      selfieURL,
-      message: comparisonResult.matched
-        ? "Verification successful! Your profile is now live."
-        : "Verification failed. Please ensure your selfie matches the profile photo.",
+      success: result.matched,
+      confidence: result.confidence,
+      message: result.matched
+        ? "Verification successful!"
+        : "Verification failed. Try again.",
+      skipped: false,
     };
   } catch (error) {
-    console.error("Verification error:", error);
-    throw error;
+    console.error("Identity verification error:", error);
+    return {
+      success: false,
+      message: "Verification failed due to an error.",
+      skipped: false,
+    };
   }
 };
 
-/**
- * Check Camera Permission
- */
+// Camera permission
 export const checkCameraPermission = async () => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    stream.getTracks().forEach((track) => track.stop());
+    stream.getTracks().forEach((t) => t.stop());
     return true;
-  } catch (error) {
-    console.error("Camera permission error:", error);
+  } catch {
     return false;
   }
 };
 
-/**
- * Capture a frame from video element
- */
+// Capture selfie
 export const captureImageFromVideo = (videoElement) => {
   const canvas = document.createElement("canvas");
   canvas.width = videoElement.videoWidth;
   canvas.height = videoElement.videoHeight;
-
   const ctx = canvas.getContext("2d");
   ctx.drawImage(videoElement, 0, 0);
-
   return canvas.toDataURL("image/jpeg", 0.95);
 };

@@ -10,8 +10,15 @@ const ProtectedRoute = ({ children, requireVerification = false }) => {
     return <Navigate to="/onboarding" replace />;
   }
 
-  // Requires verification but user not verified → go to verify page
-  if (requireVerification && !profile?.isVerified) {
+  // ✅ NEW LOGIC:
+  // Require verification → block ONLY if:
+  //   - user is NOT verified
+  //   - AND user did NOT skip verification
+  if (
+    requireVerification &&
+    !profile?.verified &&
+    !profile?.verificationSkipped
+  ) {
     return <Navigate to="/verify" replace />;
   }
 
@@ -20,3 +27,4 @@ const ProtectedRoute = ({ children, requireVerification = false }) => {
 };
 
 export default ProtectedRoute;
+
