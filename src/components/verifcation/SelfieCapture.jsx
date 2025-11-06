@@ -181,4 +181,4 @@ const SelfieCapture = ({ onCapture, profilePhotoURL }) => {
   );
 };
 
-export default SelfieCapture;
+export default SelfieCapture ;

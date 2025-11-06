@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth.js';
 import { getDiscoverProfiles, createSwipe, getUserSwipes } from '../../services/firestore.js';
+<<<<<<< HEAD
 import ProfileCard from '../discover/ProfileCard.jsx';
 
 // ✅ FIXED PATH
 import SwipeActions from '../discover/SwipeActions.jsx';
 
+=======
+import ProfileCard from '../components/discover/ProfileCard';
+import SwipeActions from '../components/discover/SwipeActions';
+>>>>>>> f0ad6cfda9215423e9e6159d340c95e9e075098a
 import { Loader, PartyPopper, Heart } from 'lucide-react';
 
 const Discover = () => {

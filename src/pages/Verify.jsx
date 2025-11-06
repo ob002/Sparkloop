@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Shield, Loader, CheckCircle, XCircle } from "lucide-react";
@@ -8,6 +9,14 @@ import { verifyUserIdentity } from "../services/faceVerification.js";
 
 import { db } from "../services/firebase.js";
 import { doc, updateDoc } from "firebase/firestore";
+=======
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import { verifyUserIdentity } from '../services/faceVerification';
+import SelfieCapture from '../components/verification/SelfieCapture.jsx';
+import { Shield, Loader, CheckCircle, XCircle } from 'lucide-react';
+>>>>>>> f0ad6cfda9215423e9e6159d340c95e9e075098a
 
 const Verify = () => {
   const navigate = useNavigate();
