@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
-import ProtectedRoute from './components/layout/ProtectedRoute';
+import ProtectedRoute from './components/layout/ProtectedRoute.jsx';
 import Landing from './pages/Landing';
 import Onboarding from './pages/Onboarding';
 import Verify from './pages/Verify';
 import Discover from './pages/Discover';
-import Chat from './pages/Chat';
+import Chat from './pages/ChatList.jsx';
 
 function App() {
   return (

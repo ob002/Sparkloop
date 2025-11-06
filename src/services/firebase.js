@@ -1,7 +1,11 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth';
-import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  GithubAuthProvider
+} from "firebase/auth";
+import { getFirestore, initializeFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";  // ✅ FIX — add storage
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -12,32 +16,20 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize services
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-
-// Configure providers
-export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({
-  prompt: 'select_account'
+// ✅ Modern persistent cache
+const db = initializeFirestore(app, {
+  localCache: "persistent",
 });
 
-export const githubProvider = new GithubAuthProvider();
-githubProvider.setCustomParameters({
-  allow_signup: 'true'
-});
+const auth = getAuth(app);
 
-// Enable offline persistence
-enableIndexedDbPersistence(db).catch((err) => {
-  if (err.code === 'failed-precondition') {
-    console.warn('Multiple tabs open, persistence can only be enabled in one tab at a time.');
-  } else if (err.code === 'unimplemented') {
-    console.warn('The current browser does not support persistence.');
-  }
-});
+// ✅ Providers
+const googleProvider = new GoogleAuthProvider();
+const githubProvider = new GithubAuthProvider(); // remove if not needed
 
-export default app;
+// ✅ ✅ FIX — Initialize storage
+const storage = getStorage(app);
+
+export { app, db, auth, googleProvider, githubProvider, storage };

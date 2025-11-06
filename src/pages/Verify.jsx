@@ -1,147 +1,107 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import { verifyUserIdentity } from '../services/faceVerification';
-import SelfieCapture from '../components/verification/SelfieCapture';
-import { Shield, Loader, CheckCircle, XCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Shield, Loader, CheckCircle, XCircle } from "lucide-react";
+
+import { useAuth } from "../hooks/useAuth.js";
+
+// ✅ Correct import according to your folder structure
+import SelfieCapture from "../components/verifcation/SelfieCapture.jsx";
+
+import { verifyUserIdentity } from "../services/faceVerification.js";
 
 const Verify = () => {
-  const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const { user, profile } = useAuth();
+
   const [verifying, setVerifying] = useState(false);
   const [result, setResult] = useState(null);
 
   const handleSelfieCapture = async (imageData) => {
+    if (!user?.uid || !profile?.photoURL) {
+      setResult({
+        success: false,
+        message: "Missing profile or user data.",
+      });
+      return;
+    }
+
     setVerifying(true);
 
     try {
-      const verificationResult = await verifyUserIdentity(
+      const data = await verifyUserIdentity(
         user.uid,
         imageData,
         profile.photoURL
       );
 
-      setResult(verificationResult);
+      setResult(data);
 
-      if (verificationResult.success) {
-        // Redirect to discover after 2 seconds
-        setTimeout(() => {
-          navigate('/discover');
-        }, 2000);
+      if (data.success) {
+        setTimeout(() => navigate("/discover"), 1800);
       }
-    } catch (error) {
-      console.error('Verification error:', error);
+    } catch (e) {
       setResult({
         success: false,
-        message: 'Verification failed. Please try again.',
+        message: "Verification failed. Try again.",
       });
     } finally {
       setVerifying(false);
     }
   };
 
-  const handleRetry = () => {
-    setResult(null);
-    window.location.reload();
-  };
+  if (!profile) return <div className="text-white p-8">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-500 via-pink-500 to-orange-500 py-12 px-4">
-      <div className="container mx-auto max-w-4xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <Shield className="w-16 h-16 text-white" />
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Identity Verification</h1>
-          <p className="text-xl text-white/90">
-            Prove you're really you - it takes 5 seconds
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-700 py-10 px-4">
+      <div className="max-w-4xl mx-auto">
+
+        <div className="text-center mb-10">
+          <Shield className="w-20 h-20 text-white mx-auto mb-4" />
+          <h1 className="text-5xl text-white font-bold">Identity Verification</h1>
+          <p className="text-white/70">Takes just a few seconds</p>
         </div>
 
-        {/* Main Content */}
+        {/* Capture */}
         {!result && !verifying && (
           <SelfieCapture
             onCapture={handleSelfieCapture}
-            profilePhotoURL={profile?.photoURL}
+            profilePhotoURL={profile.photoURL}
           />
         )}
 
-        {/* Verifying State */}
+        {/* Loading */}
         {verifying && (
-          <div className="bg-white rounded-2xl shadow-2xl p-12 text-center">
-            <Loader className="w-16 h-16 text-primary-500 animate-spin mx-auto mb-6" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Verifying your identity...
-            </h2>
-            <p className="text-gray-600">
-              Comparing your selfie with your profile photo
-            </p>
+          <div className="bg-white rounded-3xl p-14 text-center">
+            <Loader className="w-16 h-16 text-pink-500 animate-spin mx-auto" />
+            <h2 className="text-3xl font-bold mt-6">Verifying...</h2>
+            <p className="text-gray-500">Comparing your face…</p>
           </div>
         )}
 
-        {/* Success Result */}
+        {/* Success */}
         {result?.success && (
-          <div className="bg-white rounded-2xl shadow-2xl p-12 text-center">
-            <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">
-              Verification Successful! 🎉
-            </h2>
-            <p className="text-lg text-gray-600 mb-2">{result.message}</p>
-            <p className="text-sm text-gray-500 mb-6">
-              Confidence: {result.confidence?.toFixed(1)}%
-            </p>
-            <div className="inline-flex items-center gap-2 text-primary-600">
-              <Loader className="w-5 h-5 animate-spin" />
-              <span>Redirecting to discover...</span>
-            </div>
+          <div className="bg-white rounded-3xl p-14 text-center">
+            <CheckCircle className="w-24 h-24 text-green-500 mx-auto" />
+            <h2 className="text-4xl font-bold mt-6">Verified! 🎉</h2>
+            <p className="text-gray-700 mt-4">{result.message}</p>
           </div>
         )}
 
-        {/* Failed Result */}
+        {/* Failure */}
         {result && !result.success && (
-          <div className="bg-white rounded-2xl shadow-2xl p-12 text-center">
-            <XCircle className="w-20 h-20 text-red-500 mx-auto mb-6" />
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">
-              Verification Failed
-            </h2>
-            <p className="text-lg text-gray-600 mb-6">{result.message}</p>
-            {result.confidence && (
-              <p className="text-sm text-gray-500 mb-6">
-                Confidence: {result.confidence.toFixed(1)}% (minimum 80% required)
-              </p>
-            )}
-            <button onClick={handleRetry} className="btn-primary">
+          <div className="bg-white rounded-3xl p-14 text-center">
+            <XCircle className="w-24 h-24 text-red-500 mx-auto" />
+            <h2 className="text-4xl font-bold mt-6">Verification Failed</h2>
+            <p className="text-gray-700 mt-4">{result.message}</p>
+
+            <button
+              onClick={() => setResult(null)}
+              className="mt-6 px-8 py-3 bg-pink-500 text-white rounded-xl"
+            >
               Try Again
             </button>
           </div>
         )}
-
-        {/* Progress Indicator */}
-        <div className="mt-8 bg-white/20 backdrop-blur-lg rounded-xl p-6">
-          <div className="flex items-center justify-between text-white">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
-                ✓
-              </div>
-              <span>Sign In</span>
-            </div>
-            <div className="flex-1 h-1 bg-white/30 mx-4"></div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
-                ✓
-              </div>
-              <span>Profile</span>
-            </div>
-            <div className="flex-1 h-1 bg-white/30 mx-4"></div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold">
-                3
-              </div>
-              <span>Verify</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

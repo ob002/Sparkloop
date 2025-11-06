@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Camera, Loader, CheckCircle, XCircle } from 'lucide-react';
+import { Loader, CheckCircle, XCircle, Camera } from 'lucide-react';
 
 const SelfieCapture = ({ onCapture, profilePhotoURL }) => {
   const videoRef = useRef(null);
@@ -9,7 +9,13 @@ const SelfieCapture = ({ onCapture, profilePhotoURL }) => {
   const [cameraReady, setCameraReady] = useState(false);
 
   useEffect(() => {
-    startCamera();
+    // Check for existence of navigator.mediaDevices before calling startCamera
+    if (navigator.mediaDevices) {
+        startCamera();
+    } else {
+        setError('Camera access is not supported or allowed in this environment.');
+    }
+    
     return () => {
       stopCamera();
     };
@@ -28,11 +34,14 @@ const SelfieCapture = ({ onCapture, profilePhotoURL }) => {
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         setStream(mediaStream);
-        setCameraReady(true);
+        // Only set camera ready after metadata loads
+        videoRef.current.onloadedmetadata = () => { 
+          setCameraReady(true);
+        };
       }
     } catch (err) {
       console.error('Camera error:', err);
-      setError('Unable to access camera. Please check permissions.');
+      setError('Unable to access camera. Please check permissions or if another app is using it.');
     }
   };
 
@@ -40,10 +49,14 @@ const SelfieCapture = ({ onCapture, profilePhotoURL }) => {
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
     }
+    // Only reset cameraReady if no error occurred during initial load
+    if (!error) {
+        setCameraReady(false);
+    }
   };
 
   const capturePhoto = () => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || !cameraReady) return;
 
     setCapturing(true);
 
@@ -53,15 +66,19 @@ const SelfieCapture = ({ onCapture, profilePhotoURL }) => {
     canvas.height = videoRef.current.videoHeight;
 
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(videoRef.current, 0, 0);
+    
+    // CRITICAL FIX: Flip the image horizontally on the canvas 
+    // to counteract the mirror effect applied to the video preview.
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    
+    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
     // Convert to base64
     const imageData = canvas.toDataURL('image/jpeg', 0.95);
 
-    // Stop camera
+    // Stop camera and send to parent
     stopCamera();
-
-    // Send to parent
     onCapture(imageData);
   };
 
@@ -70,9 +87,14 @@ const SelfieCapture = ({ onCapture, profilePhotoURL }) => {
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
         {/* Camera View */}
         <div className="relative bg-gray-900 aspect-video">
-          {!cameraReady && (
+          {(!cameraReady && !error) && (
             <div className="absolute inset-0 flex items-center justify-center">
               <Loader className="w-12 h-12 text-white animate-spin" />
+            </div>
+          )}
+          {error && (
+             <div className="absolute inset-0 flex items-center justify-center p-4">
+                <p className="text-white text-center text-lg">{error}</p>
             </div>
           )}
 
@@ -81,13 +103,15 @@ const SelfieCapture = ({ onCapture, profilePhotoURL }) => {
             autoPlay
             playsInline
             muted
+            // CRITICAL FIX: The transform scaleX(-1) is essential for a standard user-facing camera preview
+            style={{ transform: 'scaleX(-1)' }} 
             className="w-full h-full object-cover"
           />
 
           {/* Overlay Guide */}
-          {cameraReady && !capturing && (
+          {(cameraReady && !capturing) && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="border-4 border-white/50 rounded-full w-64 h-64"></div>
+              <div className="border-4 border-white/50 rounded-full w-64 h-64 animate-pulse"></div>
             </div>
           )}
 
@@ -97,6 +121,8 @@ const SelfieCapture = ({ onCapture, profilePhotoURL }) => {
               <img
                 src={profilePhotoURL}
                 alt="Profile"
+                // Placeholder image for the profile photo
+                onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/96x96/60A5FA/FFFFFF/png?text=Ref' }}
                 className="w-24 h-24 rounded-lg object-cover"
               />
               <p className="text-xs text-center mt-1 text-gray-600">Match this</p>
@@ -133,8 +159,9 @@ const SelfieCapture = ({ onCapture, profilePhotoURL }) => {
 
           <button
             onClick={capturePhoto}
-            disabled={!cameraReady || capturing}
-            className="btn-primary w-full flex items-center justify-center gap-2"
+            disabled={!cameraReady || capturing || !!error}
+            // Restored explicit Tailwind classes for the primary button
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 border border-transparent text-base font-medium rounded-xl shadow-lg text-white bg-pink-500 hover:bg-pink-600 disabled:bg-gray-400 transition duration-150 ease-in-out"
           >
             {capturing ? (
               <>

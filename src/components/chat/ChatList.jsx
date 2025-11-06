@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { getDiscoverProfiles, createSwipe, getUserSwipes } from '../services/firestore';
-import ProfileCard from '../components/discover/ProfileCard';
-import SwipeActions from '../components/discover/SwipeActions';
+import { useAuth } from '../../hooks/useAuth.js';
+import { getDiscoverProfiles, createSwipe, getUserSwipes } from '../../services/firestore.js';
+import ProfileCard from '../discover/ProfileCard.jsx';
+
+// ✅ FIXED PATH
+import SwipeActions from '../discover/SwipeActions.jsx';
+
 import { Loader, PartyPopper, Heart } from 'lucide-react';
 
 const Discover = () => {
@@ -23,11 +26,9 @@ const Discover = () => {
 
     try {
       setLoading(true);
-      
-      // Get already swiped user IDs
+
       const swipedIds = await getUserSwipes(user.uid);
-      
-      // Get potential matches
+
       const potentialMatches = await getDiscoverProfiles(
         user.uid,
         profile.gender,
@@ -54,12 +55,10 @@ const Discover = () => {
       const result = await createSwipe(user.uid, currentProfile.id, action);
 
       if (result.matched) {
-        // It's a match!
         setMatchedUser(currentProfile);
         setMatchModal(true);
       }
 
-      // Move to next profile
       setCurrentIndex((prev) => prev + 1);
     } catch (error) {
       console.error('Error swiping:', error);
@@ -89,7 +88,7 @@ const Discover = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="container mx-auto max-w-6xl">
-        {/* Header */}
+
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Discover</h1>
           <p className="text-gray-600">
@@ -97,17 +96,17 @@ const Discover = () => {
           </p>
         </div>
 
-        {/* Profile Card */}
         {currentProfile ? (
           <div className="max-w-md mx-auto">
             <ProfileCard profile={currentProfile} />
+
+            {/* ✅ SwipeActions now loads correctly */}
             <SwipeActions
               onPass={handlePass}
               onLike={handleLike}
               disabled={swiping}
             />
-            
-            {/* Progress */}
+
             <div className="mt-6 text-center text-sm text-gray-500">
               {currentIndex + 1} of {profiles.length}
             </div>
@@ -131,18 +130,19 @@ const Discover = () => {
         )}
       </div>
 
-      {/* Match Modal */}
       {matchModal && matchedUser && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center animate-bounce">
             <PartyPopper className="w-20 h-20 text-primary-500 mx-auto mb-4" />
+
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               It's a Match! 🎉
             </h2>
+
             <p className="text-gray-600 mb-6">
               You and {matchedUser.displayName} liked each other!
             </p>
-            
+
             <div className="flex gap-3 mb-6">
               <img
                 src={profile.photoURL}
@@ -169,8 +169,9 @@ const Discover = () => {
               >
                 Keep Swiping
               </button>
+
               <button
-                onClick={() => window.location.href = '/chat'}
+                onClick={() => (window.location.href = "/chat")}
                 className="flex-1 btn-primary"
               >
                 Say Hello
