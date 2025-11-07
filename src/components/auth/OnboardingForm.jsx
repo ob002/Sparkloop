@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { completeOnboarding } from '../../services/auth';
-import { generateIceBreakers, interestOptions } from '../../utils/iceBreakers';
+import { generateIceBreakers, interestOptions } from './src/utils/iceBreakers';
 import { Loader, Sparkles } from 'lucide-react';
 
 const OnboardingForm = ({ userId }) => {
