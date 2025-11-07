@@ -9,8 +9,8 @@ import {
   doc,
   getDoc 
 } from 'firebase/firestore';
-import { db } from '../../services/firebase';
-import { useAuth } from '../../context/AuthContext';
+import { db } from '../../services/firebase.js';
+import { useAuth } from '../../context/AuthContext.jsx';
 import { generatePersonalizedIcebreaker } from '../../utils/generateIcebreaker.js';
 import { Heart, X, Sparkles, MapPin, Clock } from 'lucide-react';
 

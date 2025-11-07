@@ -1,67 +1,48 @@
-import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { useMatches } from '../hooks/useMatches';
-import ChatList from '../components/chat/ChatList';
-import ChatRoom from '../components/chat/ChatRoom';
-import { Loader, MessageSquare } from 'lucide-react';
+import React from 'react';
+import { formatDistanceToNow } from 'date-fns';
 
-const Chat = () => {
-  const { user } = useAuth();
-  const { matches, loading } = useMatches(user?.uid);
-  const [selectedMatch, setSelectedMatch] = useState(null);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader className="w-8 h-8 animate-spin text-primary-500" />
-      </div>
-    );
-  }
-
+const ChatList = ({ conversations, onChatClick }) => {
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="container mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Messages</h1>
-          <p className="text-gray-600">
-            {matches.length} active {matches.length === 1 ? 'match' : 'matches'}
-          </p>
-        </div>
+    <div className="space-y-4">
+      {conversations.map((conversation) => {
+        const otherUser = conversation.users.find(u => u.id !== conversation.currentUserUid);
+        const lastMessage = conversation.lastMessage;
 
-        {/* Chat Interface */}
-        <div className="grid md:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
-          {/* Matches List */}
-          <div className="md:col-span-1">
-            <ChatList
-              matches={matches}
-              onSelectMatch={setSelectedMatch}
-              selectedMatchId={selectedMatch?.id}
-            />
-          </div>
-
-          {/* Chat Room */}
-          <div className="md:col-span-2">
-            {selectedMatch ? (
-              <ChatRoom match={selectedMatch} currentUserId={user.uid} />
+        return (
+          <div
+            key={conversation.id}
+            onClick={() => onChatClick(conversation.id)}
+            className="flex items-center p-4 bg-white rounded-lg shadow hover:shadow-md cursor-pointer transition-shadow"
+          >
+            {otherUser?.photoURL ? (
+              <img
+                src={otherUser.photoURL}
+                alt={otherUser.displayName || 'User'}
+                className="w-12 h-12 rounded-full object-cover mr-4"
+              />
             ) : (
-              <div className="bg-white rounded-2xl shadow-lg h-full flex items-center justify-center">
-                <div className="text-center text-gray-500 p-8">
-                  <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                  <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                    Select a match to start chatting
-                  </h3>
-                  <p className="text-sm">
-                    Remember: You have 24 hours to send a message or the match expires!
-                  </p>
-                </div>
+              <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
+                <span className="text-gray-500">?</span>
               </div>
             )}
+            <div className="flex-1 min-w-0">
+              <div className="flex justify-between items-baseline">
+                <h3 className="font-semibold truncate">{otherUser?.displayName || 'Unknown'}</h3>
+                {lastMessage?.timestamp && (
+                  <span className="text-xs text-gray-500 ml-2">
+                    {formatDistanceToNow(lastMessage.timestamp.toDate(), { addSuffix: true })}
+                  </span>
+                )}
+              </div>
+              <p className="text-gray-600 text-sm truncate">
+                {lastMessage?.text || 'No messages yet'}
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })}
     </div>
   );
 };
 
-export default Chat;
+export default ChatList;
