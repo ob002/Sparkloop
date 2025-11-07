@@ -129,22 +129,6 @@ function SocialLogin({ onSuccess }) {
             </button>
           </p>
         </div>
-
-        {/* Features */}
-        <div className="mt-8 grid grid-cols-3 gap-4 text-center">
-          <div>
-            <div className="text-white font-semibold text-lg mb-1">10k+</div>
-            <div className="text-white text-opacity-80 text-sm">Active Users</div>
-          </div>
-          <div>
-            <div className="text-white font-semibold text-lg mb-1">5k+</div>
-            <div className="text-white text-opacity-80 text-sm">Matches Made</div>
-          </div>
-          <div>
-            <div className="text-white font-semibold text-lg mb-1">4.8★</div>
-            <div className="text-white text-opacity-80 text-sm">Rating</div>
-          </div>
-        </div>
       </div>
     </div>
   );
