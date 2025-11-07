@@ -22,7 +22,7 @@ const iceBreakers = [
   "What's something that always makes you smile?"
 ];
 
-export const generateIcebreaker = () => {
+export const generateIceBreaker = () => {
   const randomIndex = Math.floor(Math.random() * icebreakers.length);
   return icebreakers[randomIndex];
 };
@@ -50,8 +50,8 @@ export const generatePersonalizedIcebreaker = (userInterests, matchInterests) =>
       'Nature': "What's your favorite outdoor activity?"
     };
 
-    return interestBreakers[interest] || generateIcebreaker();
+    return interestBreakers[interest] || generateIceBreaker();
   }
 
-  return generateIcebreaker();
+  return generateIceBreaker();
 };
