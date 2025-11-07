@@ -93,7 +93,7 @@ const Landing = () => {
         {/* CTA */}
         <div className="text-center mb-12">
           <button
-            onClick={() => navigate('/Onboarding')}
+            onClick={() => navigate('/onboarding')}
             className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-12 py-5 rounded-full text-2xl font-bold hover:shadow-lg transition-all transform hover:scale-105 shadow-md"
           >
             Join SparkLoop Now
