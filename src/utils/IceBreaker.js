@@ -1,5 +1,5 @@
 // Simple AI-like icebreaker generator
-const icebreakers = [
+const iceBreakers = [
   "What's the best adventure you've been on?",
   "If you could have dinner with anyone, who would it be?",
   "What's something you're passionate about?",
