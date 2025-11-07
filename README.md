@@ -117,7 +117,7 @@ sparkloop/
 ---
 
 ## 🔗 Live Links
-- **Live Demo**: https://sparkloop.web.app  
+- **Live Demo**: https://sparkloopdate.netlify.app  
 - **Slides**:  https://docs.google.com/presentation/d/1NOlpl7s0xeoTfQGjZ5JA683CU6T0fCkS5ZLIOliyNUU/edit?usp=sharing
 - **Repo**:  https://github.com/ob002/Sparkloop.git
      
